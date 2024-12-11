@@ -1,11 +1,20 @@
 #!/bin/bash
-ENV_NAME=$1
-PY_SCRIPT_PATH=$2
-PIPE_PATH="/home/mypipe"
+# named pipes created via mkfifo and are attached to the container in the config
+PIPE_PATH="/home/skynet/pipe/mypipe"
+OUTPUT_PIPE="/home/skynet/pipe/outputpipe"
 
-if [[ -p $PIPE_PATH ]]; then
-  echo "$ENV_NAME $PY_SCRIPT_PATH" > "$PIPE_PATH"
-else
-  echo "Pipe $PIPE_PATH does not exist. Exiting."
-  exit 1
+
+while true; do
+if read command < "$PIPE_PATH"; then
+  IFS=" " read -r CMD ARGS <<< "$command"
+  if [[ $CMD == "squeue" ]]; then
+    squeue > "$OUTPUT_PIPE"
+  else
+    ENV_NAME=$CMD
+    PY_SCRIPT_PATH=$ARGS
+    docker exec -w /home/jovyan/work jupyter-yousif \
+      bash -c "source /opt/conda/bin/activate $ENV_NAME && python $PY_SCRIPT_PATH" \
+      > "$OUTPUT_PIPE" 2>&1
+  fi
 fi
+done
