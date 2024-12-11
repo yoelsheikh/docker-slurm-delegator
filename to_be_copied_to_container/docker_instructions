@@ -1,0 +1,4 @@
+on the dockerfile copy these scripts
+make sure that they are executable i.e. chmod -x 
+make sure also that the pipes have the correct permissions for execution x, writing and reading by 
+both jovyan (docker user) and the skynet user
