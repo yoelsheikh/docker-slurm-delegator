@@ -3,13 +3,12 @@
 PIPE_PATH="/home/skynet/pipe/mypipe"
 OUTPUT_PIPE="/home/skynet/pipe/outputpipe"
 
-
 while true; do
 if read command < "$PIPE_PATH"; then
   IFS=" " read -r ALPH BETA GAMM <<< "$command"
   # debug
   echo "ALPH: $ALPH, BETA: $BETA, GAMM: $GAMM"
-  if [[ $CMD == "squeue" ]]; then
+  if [[ $ALPH == "squeue" ]]; then
     squeue > "$OUTPUT_PIPE"
   else
     ENV_NAME=$BETA
